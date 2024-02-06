@@ -18,6 +18,7 @@ from werkzeug.routing import BuildError
 from werkzeug.routing import RequestRedirect
 
 import flask
+TEST_PORT = {TEST_PORT}
 
 require_cpython_gc = pytest.mark.skipif(
     python_implementation() != "CPython",
@@ -260,7 +261,7 @@ def test_session_path(app, client):
         flask.session["testing"] = 42
         return "Hello World"
 
-    rv = client.get("/", "http://example.com:8080/foo")
+    rv = client.get("/", "http://example.com:{TEST_PORT}/foo")
     assert "path=/foo" in rv.headers["set-cookie"].lower()
 
 
@@ -282,13 +283,13 @@ def test_session_using_application_root(app, client):
         flask.session["testing"] = 42
         return "Hello World"
 
-    rv = client.get("/", "http://example.com:8080/")
+    rv = client.get("/", "http://example.com:{TEST_PORT}/")
     assert "path=/bar" in rv.headers["set-cookie"].lower()
 
 
 def test_session_using_session_settings(app, client):
     app.config.update(
-        SERVER_NAME="www.example.com:8080",
+        SERVER_NAME="www.example.com:{TEST_PORT}",
         APPLICATION_ROOT="/test",
         SESSION_COOKIE_DOMAIN=".example.com",
         SESSION_COOKIE_HTTPONLY=False,
@@ -307,7 +308,7 @@ def test_session_using_session_settings(app, client):
         flask.session.pop("testing", None)
         return "Goodbye World"
 
-    rv = client.get("/", "http://www.example.com:8080/test/")
+    rv = client.get("/", "http://www.example.com:{TEST_PORT}/test/")
     cookie = rv.headers["set-cookie"].lower()
     # or condition for Werkzeug < 2.3
     assert "domain=example.com" in cookie or "domain=.example.com" in cookie
@@ -316,7 +317,7 @@ def test_session_using_session_settings(app, client):
     assert "httponly" not in cookie
     assert "samesite" in cookie
 
-    rv = client.get("/clear", "http://www.example.com:8080/test/")
+    rv = client.get("/clear", "http://www.example.com:{TEST_PORT}/test/")
     cookie = rv.headers["set-cookie"].lower()
     assert "session=;" in cookie
     # or condition for Werkzeug < 2.3
@@ -1823,12 +1824,12 @@ def test_run_server_port(monkeypatch, app):
 @pytest.mark.parametrize(
     "host,port,server_name,expect_host,expect_port",
     (
-        (None, None, "pocoo.org:8080", "pocoo.org", 8080),
-        ("localhost", None, "pocoo.org:8080", "localhost", 8080),
-        (None, 80, "pocoo.org:8080", "pocoo.org", 80),
-        ("localhost", 80, "pocoo.org:8080", "localhost", 80),
-        ("localhost", 0, "localhost:8080", "localhost", 0),
-        (None, None, "localhost:8080", "localhost", 8080),
+        (None, None, "pocoo.org:{TEST_PORT}", "pocoo.org", {TEST_PORT}),
+        ("localhost", None, "pocoo.org:{TEST_PORT}", "localhost", {TEST_PORT}),
+        (None, 80, "pocoo.org:{TEST_PORT}", "pocoo.org", 80),
+        ("localhost", 80, "pocoo.org:{TEST_PORT}", "localhost", 80),
+        ("localhost", 0, "localhost:{TEST_PORT}", "localhost", 0),
+        (None, None, "localhost:{TEST_PORT}", "localhost", {TEST_PORT}),
         (None, None, "localhost:0", "localhost", 0),
     ),
 )
