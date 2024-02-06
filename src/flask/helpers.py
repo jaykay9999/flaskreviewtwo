@@ -82,7 +82,7 @@ def stream_with_context(
                 yield '!'
             return Response(stream_with_context(generate()))
 
-    .. versionadded:: 0.9
+    
     """
     try:
         gen = iter(generator_or_function)  # type: ignore
@@ -205,18 +205,7 @@ def url_for(
         Unknown keys are appended as query string arguments, like
         ``?a=b&c=d``.
 
-    .. versionchanged:: 2.2
-        Calls ``current_app.url_for``, allowing an app to override the
-        behavior.
-
-    .. versionchanged:: 0.10
-       The ``_scheme`` parameter was added.
-
-    .. versionchanged:: 0.9
-       The ``_anchor`` and ``_method`` parameters were added.
-
-    .. versionchanged:: 0.9
-       Calls ``app.handle_url_build_error`` on build errors.
+    
     """
     return current_app.url_for(
         endpoint,
@@ -242,9 +231,7 @@ def redirect(
     :param Response: The response class to use. Not used when
         ``current_app`` is active, which uses ``app.response_class``.
 
-    .. versionadded:: 2.2
-        Calls ``current_app.redirect`` if available instead of always
-        using Werkzeug's default ``redirect``.
+    
     """
     if current_app:
         return current_app.redirect(location, code=code)
@@ -265,9 +252,7 @@ def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn
     :param args: Passed to the exception.
     :param kwargs: Passed to the exception.
 
-    .. versionadded:: 2.2
-        Calls ``current_app.aborter`` if available instead of always
-        using Werkzeug's default ``abort``.
+    
     """
     if current_app:
         current_app.aborter(code, *args, **kwargs)
@@ -289,10 +274,7 @@ def get_template_attribute(template_name: str, attribute: str) -> t.Any:
         hello = get_template_attribute('_cider.html', 'hello')
         return hello('World')
 
-    .. versionadded:: 0.2
-
-    :param template_name: the name of the template
-    :param attribute: the name of the variable of macro to access
+    
     """
     return getattr(current_app.jinja_env.get_template(template_name).module, attribute)
 
@@ -302,8 +284,7 @@ def flash(message: str, category: str = "message") -> None:
     flashed message from the session and to display it to the user,
     the template has to call :func:`get_flashed_messages`.
 
-    .. versionchanged:: 0.3
-       `category` parameter added.
+  
 
     :param message: the message to be flashed.
     :param category: the category for the message.  The following values
@@ -352,11 +333,7 @@ def get_flashed_messages(
 
     See :doc:`/patterns/flashing` for examples.
 
-    .. versionchanged:: 0.3
-       `with_categories` parameter added.
-
-    .. versionchanged:: 0.9
-        `category_filter` parameter added.
+  
 
     :param with_categories: set to ``True`` to also receive categories.
     :param category_filter: filter of categories to limit return values.  Only
